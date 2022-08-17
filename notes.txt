@@ -1,0 +1,15 @@
+- [ ] Create board 
+  - [ ] Matrix representation 
+- [ ] Create snake 
+  - [ ] Singly linked List representation
+  - [ ] Handle snake growth 
+  - [ ] Handle snake direction reversal 
+- [ ] Styles
+  - [ ] Snake Cells 
+  - [ ] Food Cells
+- [ ] Handle Keypresses
+- [ ] Handle Movements
+- [ ] Handle food consumption
+- [ ] Handle death
+- [ ] Handle Score 
+- [ ] Handle Start and game Reset
