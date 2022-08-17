@@ -1,3 +1,5 @@
+import { computeHeadingLevel } from "@testing-library/react";
+import { useEffect } from "react";
 import { useState } from "react";
 
 import "./Board.css";
@@ -9,7 +11,7 @@ class LinkedListNode {
   }
 }
 
-class SinglyLinkedList {
+class LinkedList {
   constructor(value) {
     const node = new LinkedListNode(value);
     this.head = node;
@@ -26,8 +28,8 @@ const Direction = {
 
 const BOARD_SIZE = 10;
 
-const getStartingSnakeLLValue = board => {
-  const rowSize = board.length; 
+const getStartingSnakeLLValue = (board) => {
+  const rowSize = board.length;
   const colSize = board[0].length;
   const startingRow = Math.round(rowSize / 3);
   const startingCol = Math.round(colSize / 3);
@@ -36,14 +38,35 @@ const getStartingSnakeLLValue = board => {
     row: startingRow,
     col: startingCol,
     cell: startingCell,
-  }
-}
+  };
+};
 
 const Board = () => {
   const [board, setBoard] = useState(createBoard(BOARD_SIZE));
-  const [snakeCells, setSnakeCells] = useState(new Set([44]));
-  const [snake, setSnake] = useState(new SinglyLinkedList(44));
+  const [snake, setSnake] = useState(
+    new LinkedList(getStartingSnakeLLValue(board))
+  );
+  const [snakeCells, setSnakeCells] = useState(
+    new Set([snake.head.value.cell])
+  );
   const [direction, setDirection] = useState(Direction.RIGHT);
+
+  useEffect(() => {
+    window.addEventListener("keydown", (e) => {
+      handleKeyDown(e);
+    });
+  });
+
+  const handleKeyDown = (e) => {
+    const newDirection = getDirectionFromKey(e.key);
+    const isValidDirection = newDirection !== "";
+    if (!isValidDirection) return;
+    const snakeRunIntoItself =
+      getOppositeDirection(newDirection) === direction && snakeCells.size > 1;
+
+    if (snakeRunIntoItself) return;
+    setDirection(newDirection);
+  };
 
   return (
     <div className="board">
@@ -59,6 +82,7 @@ const Board = () => {
           ))}
         </div>
       ))}
+      {console.log(direction)}
     </div>
   );
 };
@@ -82,6 +106,13 @@ const getDirectionFromKey = (key) => {
   if (key === "ArrowLeft") return Direction.LEFT;
   if (key === "ArrowRight") return Direction.RIGHT;
   return "";
+};
+
+const getOppositeDirection = (dir) => {
+  if (dir === Direction.UP) return Direction.DOWN;
+  if (dir === Direction.DOWN) return Direction.UP;
+  if (dir === Direction.LEFT) return Direction.RIGHT;
+  if (dir === Direction.RIGHT) return Direction.LEFT;
 };
 
 export default Board;
