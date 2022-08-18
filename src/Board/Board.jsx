@@ -1,6 +1,8 @@
 import { computeHeadingLevel } from "@testing-library/react";
+import { setSelectionRange } from "@testing-library/user-event/dist/utils/index.js";
 import { useEffect } from "react";
 import { useState } from "react";
+import { useInterval } from "../lib/utils.js";
 
 import "./Board.css";
 
@@ -50,6 +52,8 @@ const Board = () => {
     new Set([snake.head.value.cell])
   );
   const [direction, setDirection] = useState(Direction.RIGHT);
+  const [score, setScore] = useState(0);
+  const [foodCell, setFoodCell] = useState(snake.head.value.cell + 5);
 
   useEffect(() => {
     window.addEventListener("keydown", (e) => {
@@ -66,6 +70,16 @@ const Board = () => {
 
     if (snakeRunIntoItself) return;
     setDirection(newDirection);
+  };
+
+  const handleGameOver = () => {
+    setScore(0);
+
+    const snakeLLStartingValue = getStartingSnakeLLValue(board);
+    setSnake(new LinkedList(snakeLLStartingValue));
+    setFoodCell(snakeLLStartingValue);
+    setSnakeCells(new Set([snakeLLStartingValue.cell]));
+    setDirection(Direction.RIGHT);
   };
 
   return (
@@ -113,6 +127,41 @@ const getOppositeDirection = (dir) => {
   if (dir === Direction.DOWN) return Direction.UP;
   if (dir === Direction.LEFT) return Direction.RIGHT;
   if (dir === Direction.RIGHT) return Direction.LEFT;
+};
+
+const getCoordsInDirection = (coords, direction) => {
+  if (direction === Direction.UP) {
+    return {
+      row: coords.row - 1,
+      col: coords.col,
+    };
+  }
+  if (direction === Direction.DOWN) {
+    return {
+      row: coords.row + 1,
+      col: coords.col,
+    };
+  }
+  if (direction === Direction.LEFT) {
+    return {
+      row: coords.row,
+      col: coords.col - 1,
+    };
+  }
+  if (direction === Direction.RIGHT) {
+    return {
+      row: coords.row,
+      col: coords.col + 1,
+    };
+  }
+};
+
+const isOutOfBounds = (coords, board) => {
+  const { row, col } = coords;
+
+  if (row < 0 || col < 0) return true;
+  if (row >= board.length || col >= board[0].length) return true;
+  return false;
 };
 
 export default Board;
